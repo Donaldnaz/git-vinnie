@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+{% block title %}| Register{% endblock %}
+
+{% block content %}
+<!--
+  register.html — Student registration form.
+  Demonstrates: LPUSH, SET, INCR (on form submission via POST).
+-->
+
+<section class="section">
+  <div class="container container--narrow">
+
+    <h1 class="page-title">✏️ Register Your Name</h1>
+    <p class="page-desc">
+      Enter your name below. It will be stored in Redis using
+      <code>LPUSH students:names &lt;your_name&gt;</code>.
+    </p>
+
+    <!-- ── Success / Error Messages ────────────────────────────────────── -->
+    {% if message %}
+      <div class="alert alert--success">{{ message }}</div>
+    {% endif %}
+    {% if error %}
+      <div class="alert alert--error">{{ error }}</div>
+    {% endif %}
+
+    <!-- ── Redis Connection Warning ────────────────────────────────────── -->
+    {% if not redis_connected %}
+      <div class="alert alert--warning">
+        ⚠️ Redis is currently unavailable. Registrations cannot be saved.
+      </div>
+    {% endif %}
+
+    <!-- ── Registration Form ──────────────────────────────────────────── -->
+    <div class="form-card">
+      <form method="POST" action="{{ url_for('register') }}">
+        <div class="form-group">
+          <label class="form-label" for="name">Your Full Name</label>
+          <input
+            class="form-input"
+            type="text"
+            id="name"
+            name="name"
+            placeholder="e.g. Ada Lovelace"
+            maxlength="80"
+            required
+            {% if not redis_connected %}disabled{% endif %}
+          />
+        </div>
+        <button
+          class="btn btn--primary"
+          type="submit"
+          {% if not redis_connected %}disabled{% endif %}
+        >
+          Register ➜
+        </button>
+      </form>
+    </div>
+
+    <!-- ── Redis Explainer ────────────────────────────────────────────── -->
+    <div class="explainer">
+      <h3>🔍 What happens when you submit?</h3>
+      <ol class="explainer-list">
+        <li>
+          <code>LPUSH students:names "Your Name"</code>
+          &mdash; adds your name to the <em>front</em> of a Redis list.
+        </li>
+        <li>
+          <code>SET stats:last_student "Your Name"</code>
+          &mdash; records the most recent registrant.
+        </li>
+        <li>
+          <code>INCR stats:student_count</code>
+          &mdash; increments the running total by 1.
+        </li>
+      </ol>
+      <p>
+        You can verify these keys in
+        <a href="http://localhost:8081" target="_blank">Redis Commander</a>
+        after submitting.
+      </p>
+    </div>
+
+  </div>
+</section>
+
+{% endblock %}

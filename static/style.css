@@ -1,0 +1,612 @@
+/*
+  style.css — CloudBoard stylesheet
+  ==================================
+  A clean, responsive design using CSS custom properties (variables),
+  CSS Grid, and Flexbox. No JavaScript frameworks required.
+
+  Table of contents:
+  1. CSS Variables (design tokens)
+  2. Reset & base styles
+  3. Layout helpers
+  4. Navigation
+  5. Hero section
+  6. Cards
+  7. Action cards
+  8. Forms
+  9. Alerts
+  10. Student list
+  11. Explainer boxes
+  12. Danger box
+  13. Tables
+  14. Footer
+  15. Utility classes
+  16. Responsive overrides
+*/
+
+/* ── 1. CSS Variables ──────────────────────────────────────────────────── */
+:root {
+  --color-bg:         #f0f4f8;
+  --color-surface:    #ffffff;
+  --color-border:     #d1d9e0;
+  --color-text:       #1a202c;
+  --color-muted:      #718096;
+  --color-link:       #2b6cb0;
+
+  --color-blue:       #3182ce;
+  --color-blue-light: #ebf8ff;
+  --color-green:      #38a169;
+  --color-green-light:#f0fff4;
+  --color-red:        #e53e3e;
+  --color-red-light:  #fff5f5;
+  --color-orange:     #dd6b20;
+  --color-orange-light:#fffaf0;
+  --color-purple:     #805ad5;
+  --color-purple-light:#faf5ff;
+
+  --color-nav-bg:     #1a365d;
+  --color-nav-text:   #bee3f8;
+  --color-nav-hover:  #ffffff;
+
+  --color-hero-from:  #2c5282;
+  --color-hero-to:    #1a365d;
+
+  --shadow-sm:  0 1px 3px rgba(0,0,0,.10), 0 1px 2px rgba(0,0,0,.06);
+  --shadow-md:  0 4px 6px rgba(0,0,0,.07), 0 2px 4px rgba(0,0,0,.06);
+  --shadow-lg:  0 10px 15px rgba(0,0,0,.10), 0 4px 6px rgba(0,0,0,.05);
+
+  --radius-sm:  6px;
+  --radius-md:  10px;
+  --radius-lg:  16px;
+
+  --font-sans:  'Segoe UI', system-ui, -apple-system, sans-serif;
+  --font-mono:  'Consolas', 'Courier New', monospace;
+
+  --transition: 0.2s ease;
+}
+
+/* ── 2. Reset & base styles ────────────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  line-height: 1.6;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+a {
+  color: var(--color-link);
+  text-decoration: none;
+}
+a:hover { text-decoration: underline; }
+
+code, pre {
+  font-family: var(--font-mono);
+  font-size: 0.875em;
+}
+
+code {
+  background: #edf2f7;
+  padding: 0.15em 0.45em;
+  border-radius: 4px;
+  color: #c53030;
+}
+
+/* ── 3. Layout helpers ──────────────────────────────────────────────────── */
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+.container--narrow {
+  max-width: 720px;
+}
+
+.main-content {
+  flex: 1;
+}
+
+.section {
+  padding: 3rem 0;
+}
+
+.section--alt {
+  background: #e8edf3;
+}
+
+.section-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  color: var(--color-text);
+}
+
+.section-desc {
+  color: var(--color-muted);
+  margin-bottom: 2rem;
+  font-size: 0.95rem;
+}
+
+.page-title {
+  font-size: 2rem;
+  font-weight: 800;
+  margin-bottom: 0.75rem;
+  color: var(--color-text);
+}
+
+.page-desc {
+  color: var(--color-muted);
+  margin-bottom: 2rem;
+  font-size: 0.95rem;
+}
+
+/* ── 4. Navigation ──────────────────────────────────────────────────────── */
+.navbar {
+  background-color: var(--color-nav-bg);
+  box-shadow: var(--shadow-md);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.nav-container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.nav-brand {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: 0.02em;
+  text-decoration: none;
+}
+.nav-brand:hover { color: #bee3f8; text-decoration: none; }
+
+.nav-links {
+  list-style: none;
+  display: flex;
+  gap: 0.25rem;
+}
+
+.nav-links a {
+  color: var(--color-nav-text);
+  font-size: 0.9rem;
+  font-weight: 500;
+  padding: 0.4rem 0.85rem;
+  border-radius: var(--radius-sm);
+  transition: background var(--transition), color var(--transition);
+  text-decoration: none;
+}
+.nav-links a:hover {
+  background: rgba(255,255,255,.12);
+  color: var(--color-nav-hover);
+  text-decoration: none;
+}
+
+.nav-reset {
+  color: #fc8181 !important;
+}
+.nav-reset:hover {
+  background: rgba(252,129,129,.15) !important;
+}
+
+/* ── 5. Hero section ────────────────────────────────────────────────────── */
+.hero {
+  background: linear-gradient(135deg, var(--color-hero-from), var(--color-hero-to));
+  color: #fff;
+  padding: 4rem 1.5rem;
+  text-align: center;
+}
+
+.hero-inner {
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.hero-title {
+  font-size: clamp(2rem, 5vw, 3.25rem);
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  margin-bottom: 1rem;
+}
+
+.hero-subtitle {
+  font-size: clamp(1rem, 2.5vw, 1.25rem);
+  opacity: 0.85;
+  line-height: 1.5;
+}
+
+/* ── 6. Cards ───────────────────────────────────────────────────────────── */
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.25rem;
+}
+
+.card {
+  background: var(--color-surface);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  border-left: 4px solid transparent;
+  transition: box-shadow var(--transition), transform var(--transition);
+}
+.card:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+.card--blue   { border-left-color: var(--color-blue);   background: var(--color-blue-light); }
+.card--green  { border-left-color: var(--color-green);  background: var(--color-green-light); }
+.card--red    { border-left-color: var(--color-red);    background: var(--color-red-light); }
+.card--orange { border-left-color: var(--color-orange); background: var(--color-orange-light); }
+.card--purple { border-left-color: var(--color-purple); background: var(--color-purple-light); }
+
+.card-icon  { font-size: 1.75rem; }
+.card-label { font-size: 0.8rem; font-weight: 600; text-transform: uppercase;
+              letter-spacing: 0.06em; color: var(--color-muted); }
+.card-value { font-size: 1.6rem; font-weight: 800; color: var(--color-text);
+              word-break: break-all; }
+.card-value.hostname { font-size: 1rem; font-family: var(--font-mono); }
+.card-value.time     { font-size: 0.95rem; font-family: var(--font-mono); }
+.card-value.name-value { font-size: 1.2rem; }
+.card-hint  { font-size: 0.78rem; color: var(--color-muted); margin-top: 0.25rem; }
+
+/* ── 7. Action cards ────────────────────────────────────────────────────── */
+.action-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1rem;
+}
+
+.action-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--color-surface);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 1.75rem 1rem;
+  text-align: center;
+  transition: border-color var(--transition), box-shadow var(--transition),
+              transform var(--transition);
+  text-decoration: none;
+  color: var(--color-text);
+}
+.action-card:hover {
+  border-color: var(--color-blue);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-3px);
+  text-decoration: none;
+  color: var(--color-text);
+}
+
+.action-icon  { font-size: 2rem; }
+.action-title { font-size: 1.1rem; font-weight: 700; }
+.action-desc  { font-size: 0.8rem; color: var(--color-muted); }
+
+/* ── 8. Forms ───────────────────────────────────────────────────────────── */
+.form-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 2rem;
+  margin-bottom: 1.5rem;
+  box-shadow: var(--shadow-sm);
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin-bottom: 1.25rem;
+}
+
+.form-label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.form-input {
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: 0.65rem 0.9rem;
+  font-size: 1rem;
+  font-family: var(--font-sans);
+  color: var(--color-text);
+  background: #fff;
+  transition: border-color var(--transition), box-shadow var(--transition);
+  outline: none;
+}
+.form-input:focus {
+  border-color: var(--color-blue);
+  box-shadow: 0 0 0 3px rgba(49,130,206,.25);
+}
+.form-input:disabled {
+  background: #f7fafc;
+  color: var(--color-muted);
+  cursor: not-allowed;
+}
+
+/* Buttons */
+.btn {
+  display: inline-block;
+  padding: 0.6rem 1.5rem;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 1rem;
+  font-weight: 600;
+  font-family: var(--font-sans);
+  cursor: pointer;
+  transition: background var(--transition), transform var(--transition),
+              box-shadow var(--transition);
+  text-decoration: none;
+}
+.btn:active { transform: scale(0.97); }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+.btn--primary {
+  background: var(--color-blue);
+  color: #fff;
+}
+.btn--primary:hover:not(:disabled) {
+  background: #2c5282;
+  box-shadow: var(--shadow-sm);
+  text-decoration: none;
+  color: #fff;
+}
+
+.btn--danger {
+  background: var(--color-red);
+  color: #fff;
+  font-size: 1rem;
+}
+.btn--danger:hover:not(:disabled) {
+  background: #c53030;
+  box-shadow: var(--shadow-sm);
+  text-decoration: none;
+  color: #fff;
+}
+
+/* ── 9. Alerts ──────────────────────────────────────────────────────────── */
+.alert {
+  padding: 0.9rem 1.2rem;
+  border-radius: var(--radius-sm);
+  margin-bottom: 1.25rem;
+  font-size: 0.95rem;
+  font-weight: 500;
+  border-left: 4px solid transparent;
+}
+
+.alert--success {
+  background: var(--color-green-light);
+  color: #276749;
+  border-left-color: var(--color-green);
+}
+
+.alert--error {
+  background: var(--color-red-light);
+  color: #9b2c2c;
+  border-left-color: var(--color-red);
+}
+
+.alert--warning {
+  background: var(--color-orange-light);
+  color: #7b341e;
+  border-left-color: var(--color-orange);
+}
+
+/* ── 10. Student list ───────────────────────────────────────────────────── */
+.student-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.student-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: 0.75rem 1.1rem;
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow var(--transition);
+}
+.student-item:hover { box-shadow: var(--shadow-md); }
+
+.student-rank {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--color-muted);
+  min-width: 2rem;
+}
+
+.student-name {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.list-summary {
+  color: var(--color-muted);
+  font-size: 0.875rem;
+  margin-bottom: 2rem;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: var(--color-muted);
+}
+.empty-icon { font-size: 3rem; margin-bottom: 0.75rem; }
+
+/* ── 11. Explainer boxes ────────────────────────────────────────────────── */
+.explainer {
+  background: #f7fafc;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 1.5rem;
+  margin-top: 2rem;
+}
+
+.explainer h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  margin-bottom: 0.75rem;
+  color: var(--color-text);
+}
+
+.explainer p {
+  font-size: 0.9rem;
+  color: var(--color-muted);
+  margin-bottom: 0.75rem;
+}
+
+.explainer-list {
+  padding-left: 1.5rem;
+  font-size: 0.9rem;
+  color: var(--color-muted);
+}
+.explainer-list li {
+  margin-bottom: 0.5rem;
+}
+
+.code-block {
+  background: #2d3748;
+  color: #e2e8f0;
+  padding: 1rem 1.25rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+  overflow-x: auto;
+  white-space: pre;
+  margin-top: 0.75rem;
+}
+
+/* ── 12. Danger box ─────────────────────────────────────────────────────── */
+.danger-box {
+  background: var(--color-red-light);
+  border: 1.5px solid #feb2b2;
+  border-radius: var(--radius-md);
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.danger-box h3 {
+  color: #9b2c2c;
+  font-size: 1.1rem;
+  margin-bottom: 0.75rem;
+}
+
+.danger-box p, .danger-box li {
+  color: #742a2a;
+  font-size: 0.9rem;
+  margin-bottom: 0.4rem;
+}
+
+.danger-box ul {
+  padding-left: 1.5rem;
+  margin-bottom: 0.75rem;
+}
+
+/* ── 13. Tables ─────────────────────────────────────────────────────────── */
+.key-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+  margin-top: 0.75rem;
+}
+
+.key-table th {
+  background: #edf2f7;
+  text-align: left;
+  padding: 0.6rem 0.85rem;
+  font-weight: 700;
+  color: var(--color-text);
+  border-bottom: 2px solid var(--color-border);
+}
+
+.key-table td {
+  padding: 0.6rem 0.85rem;
+  border-bottom: 1px solid var(--color-border);
+  color: var(--color-muted);
+  vertical-align: top;
+}
+
+.key-table tr:last-child td {
+  border-bottom: none;
+}
+
+.key-table tr:hover td {
+  background: #f7fafc;
+}
+
+/* ── 14. Footer ─────────────────────────────────────────────────────────── */
+.footer {
+  background: var(--color-nav-bg);
+  color: var(--color-nav-text);
+  padding: 1.5rem 0;
+  margin-top: auto;
+}
+
+.footer-container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+  text-align: center;
+  font-size: 0.875rem;
+}
+
+.footer a {
+  color: #90cdf4;
+}
+.footer a:hover { color: #fff; }
+
+/* ── 15. Utility classes ────────────────────────────────────────────────── */
+.mt-1 { margin-top: 0.25rem; }
+.mt-2 { margin-top: 0.5rem; }
+.mt-3 { margin-top: 1rem; }
+.mb-1 { margin-bottom: 0.25rem; }
+.mb-2 { margin-bottom: 0.5rem; }
+.mb-3 { margin-bottom: 1rem; }
+
+/* ── 16. Responsive overrides ───────────────────────────────────────────── */
+@media (max-width: 640px) {
+  .nav-links { gap: 0; }
+  .nav-links a { padding: 0.35rem 0.55rem; font-size: 0.8rem; }
+  .hero { padding: 2.5rem 1rem; }
+  .card-grid { grid-template-columns: 1fr 1fr; }
+  .card-value { font-size: 1.3rem; }
+  .action-grid { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 400px) {
+  .card-grid { grid-template-columns: 1fr; }
+  .nav-brand { font-size: 1rem; }
+}

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{{ app_name }} {% block title %}{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+</head>
+<body>
+
+  <nav class="navbar">
+    <div class="nav-container">
+      <a class="nav-brand" href="{{ url_for('home') }}">🐳 {{ app_name }}</a>
+      <ul class="nav-links">
+        <li><a href="{{ url_for('home') }}">Home</a></li>
+        <li><a href="{{ url_for('register') }}">Register</a></li>
+        <li><a href="{{ url_for('students') }}">Students</a></li>
+        <li><a href="{{ url_for('stats') }}">Stats</a></li>
+        <li><a href="{{ url_for('reset') }}" class="nav-reset">Reset</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <main class="main-content">
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="footer">
+    <div class="footer-container">
+      <p>
+        🐳 <strong>{{ app_name }}</strong> &mdash; Docker Compose Workshop
+        &nbsp;|&nbsp;
+        Built with <a href="https://flask.palletsprojects.com/" target="_blank">Flask</a>
+        &amp; <a href="https://redis.io/" target="_blank">Redis</a>
+      </p>
+    </div>
+  </footer>
+
+</body>
+</html>

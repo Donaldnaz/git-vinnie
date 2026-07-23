@@ -1,0 +1,48 @@
+services:
+  #  Flask Application
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: cloudboard_web
+    ports:
+      - "8080:5000" # Host 8080 -> Container 5000
+    env_file:
+      - .env
+    depends_on:
+      - redis
+    networks:
+      - cloudboard-net
+
+  #  Redis Database
+  redis:
+    image: redis:alpine
+    container_name: cloudboard_redis
+    command: redis-server --save 60 1 --appendonly yes
+    volumes:
+      - redis-data:/data
+    networks:
+      - cloudboard-net
+
+  #  Redis Commander (Web GUI)
+  redis-commander:
+    image: rediscommander/redis-commander:latest
+    container_name: cloudboard_commander
+    environment:
+      - REDIS_HOSTS=ikenna:redis:6379
+    ports:
+      - "8081:8081"
+    depends_on:
+      - redis
+    networks:
+      - cloudboard-net
+
+#  Persistent Volumes
+volumes:
+  redis-data:
+    driver: local
+
+#  Isolated Network
+networks:
+  cloudboard-net:
+    driver: bridge

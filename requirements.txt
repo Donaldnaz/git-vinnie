@@ -1,0 +1,12 @@
+# Python dependencies for CloudBoard
+#
+# flask     — the web framework
+# redis     — the Python client library for Redis
+# gunicorn  — production-grade WSGI server (replaces Flask's built-in dev server)
+#
+# Pinned to exact versions for reproducible builds.
+# Run locally:  pip install -r requirements.txt
+
+flask==3.0.3
+redis==5.0.8
+gunicorn==22.0.0

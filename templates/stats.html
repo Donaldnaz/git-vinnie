@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+{% block title %}| Statistics{% endblock %}
+
+{% block content %}
+<!--
+  stats.html — Aggregated statistics pulled from Redis.
+  Demonstrates: GET (reading multiple individual keys).
+-->
+
+<section class="section">
+  <div class="container">
+
+    <h1 class="page-title">📊 Application Statistics</h1>
+    <p class="page-desc">
+      Each stat below is retrieved with a Redis <code>GET</code> command.
+    </p>
+
+    <!-- ── Redis Connection Warning ────────────────────────────────────── -->
+    {% if not redis_connected %}
+      <div class="alert alert--warning">
+        ⚠️ Redis is unavailable. Statistics cannot be displayed.
+      </div>
+    {% endif %}
+
+    <!-- ── Stats Cards ────────────────────────────────────────────────── -->
+    <div class="card-grid">
+
+      <div class="card card--blue">
+        <div class="card-icon">👁️</div>
+        <div class="card-label">Total Visitors</div>
+        <div class="card-value">{{ data.visitor_count }}</div>
+        <div class="card-hint"><code>GET stats:visitor_count</code></div>
+      </div>
+
+      <div class="card card--green">
+        <div class="card-icon">🎓</div>
+        <div class="card-label">Registered Students</div>
+        <div class="card-value">{{ data.student_count }}</div>
+        <div class="card-hint"><code>GET stats:student_count</code></div>
+      </div>
+
+      <div class="card card--orange">
+        <div class="card-icon">🏅</div>
+        <div class="card-label">Last Registered</div>
+        <div class="card-value name-value">{{ data.last_student }}</div>
+        <div class="card-hint"><code>GET stats:last_student</code></div>
+      </div>
+
+      <div class="card card--purple">
+        <div class="card-icon">🕐</div>
+        <div class="card-label">Last Visit</div>
+        <div class="card-value time">{{ data.last_visit }}</div>
+        <div class="card-hint"><code>GET stats:last_visit</code></div>
+      </div>
+
+    </div><!-- /.card-grid -->
+
+    <!-- ── Redis Explainer ────────────────────────────────────────────── -->
+    <div class="explainer">
+      <h3>🔍 Redis Keys Used on This Page</h3>
+      <table class="key-table">
+        <thead>
+          <tr>
+            <th>Key</th>
+            <th>Type</th>
+            <th>Set by</th>
+            <th>Read with</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>stats:visitor_count</code></td>
+            <td>String (integer)</td>
+            <td><code>INCR</code> on home page load</td>
+            <td><code>GET</code></td>
+          </tr>
+          <tr>
+            <td><code>stats:student_count</code></td>
+            <td>String (integer)</td>
+            <td><code>INCR</code> on registration</td>
+            <td><code>GET</code></td>
+          </tr>
+          <tr>
+            <td><code>stats:last_student</code></td>
+            <td>String</td>
+            <td><code>SET</code> on registration</td>
+            <td><code>GET</code></td>
+          </tr>
+          <tr>
+            <td><code>stats:last_visit</code></td>
+            <td>String</td>
+            <td><code>SET</code> on home page load</td>
+            <td><code>GET</code></td>
+          </tr>
+          <tr>
+            <td><code>students:names</code></td>
+            <td>List</td>
+            <td><code>LPUSH</code> on registration</td>
+            <td><code>LRANGE 0 -1</code></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+</section>
+
+{% endblock %}
