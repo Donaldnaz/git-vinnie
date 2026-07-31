@@ -1,20 +1,85 @@
+# CloudBoard — Microservices Compose File
+# =========================================
+# Orchestrates 4 application services + Redis + Redis Commander.
+#
+# Service layout:
+#   web              — Flask UI (Jinja2), no Redis access, port 8080
+#   student-service  — REST JSON API, owns student registration/listing
+#   stats-service    — REST JSON API, owns visitor tracking & stats
+#   reset-service    — REST JSON API, owns destructive FLUSHALL
+#   redis            — Shared data store (all backend services connect directly)
+#   redis-commander  — Web GUI for inspecting Redis keys, port 8081
+
 services:
-  #  Flask Application
+
+  # ── Web (UI layer) ──────────────────────────────────────────────────────
   web:
     build:
-      context: .
+      context: ./services/web
       dockerfile: Dockerfile
     container_name: cloudboard_web
     ports:
-      - "8080:5000" # Host 8080 -> Container 5000
-    env_file:
-      - .env
+      - "8080:5000"           # Host 8080 → Container 5000
+    environment:
+      APP_NAME: ${APP_NAME}
+      APP_GREETING: ${APP_GREETING}
+      FLASK_PORT: "5000"
+      STUDENT_SERVICE_URL: "http://student-service:5001"
+      STATS_SERVICE_URL: "http://stats-service:5002"
+      RESET_SERVICE_URL: "http://reset-service:5003"
+    depends_on:
+      - student-service
+      - stats-service
+      - reset-service
+    networks:
+      - cloudboard-net
+
+  # ── Student Service ──────────────────────────────────────────────────────
+  student-service:
+    build:
+      context: ./services/student-service
+      dockerfile: Dockerfile
+    container_name: cloudboard_student
+    environment:
+      REDIS_HOST: redis
+      REDIS_PORT: "6379"
+      FLASK_PORT: "5001"
     depends_on:
       - redis
     networks:
       - cloudboard-net
 
-  #  Redis Database
+  # ── Stats Service ────────────────────────────────────────────────────────
+  stats-service:
+    build:
+      context: ./services/stats-service
+      dockerfile: Dockerfile
+    container_name: cloudboard_stats
+    environment:
+      REDIS_HOST: redis
+      REDIS_PORT: "6379"
+      FLASK_PORT: "5002"
+    depends_on:
+      - redis
+    networks:
+      - cloudboard-net
+
+  # ── Reset Service ────────────────────────────────────────────────────────
+  reset-service:
+    build:
+      context: ./services/reset-service
+      dockerfile: Dockerfile
+    container_name: cloudboard_reset
+    environment:
+      REDIS_HOST: redis
+      REDIS_PORT: "6379"
+      FLASK_PORT: "5003"
+    depends_on:
+      - redis
+    networks:
+      - cloudboard-net
+
+  # ── Redis ────────────────────────────────────────────────────────────────
   redis:
     image: redis:alpine
     container_name: cloudboard_redis
@@ -24,7 +89,7 @@ services:
     networks:
       - cloudboard-net
 
-  #  Redis Commander (Web GUI)
+  # ── Redis Commander (Web GUI) ────────────────────────────────────────────
   redis-commander:
     image: rediscommander/redis-commander:latest
     container_name: cloudboard_commander
@@ -37,12 +102,12 @@ services:
     networks:
       - cloudboard-net
 
-#  Persistent Volumes
+# ── Persistent Volumes ──────────────────────────────────────────────────────
 volumes:
   redis-data:
     driver: local
 
-#  Isolated Network
+# ── Isolated Network ────────────────────────────────────────────────────────
 networks:
   cloudboard-net:
     driver: bridge

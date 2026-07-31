@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block title %}| Students{% endblock %}
+
+{% block content %}
+<!--
+  students.html — Displays all registered students.
+  Demonstrates: LRANGE (reading an entire Redis list).
+-->
+
+<section class="section">
+  <div class="container container--narrow">
+
+    <h1 class="page-title">📋 Registered Students</h1>
+    <p class="page-desc">
+      This list is fetched from Redis using:
+      <code>LRANGE students:names 0 -1</code>
+    </p>
+
+    <!-- ── Redis Connection Warning ────────────────────────────────────── -->
+    {% if not redis_connected %}
+      <div class="alert alert--warning">
+        ⚠️ Redis is unavailable. Cannot retrieve student list.
+      </div>
+    {% endif %}
+
+    <!-- ── Student List ───────────────────────────────────────────────── -->
+    {% if students %}
+      <div class="student-list">
+        {% for student in students %}
+          <div class="student-item">
+            <span class="student-rank">#{{ loop.index }}</span>
+            <span class="student-name">{{ student }}</span>
+          </div>
+        {% endfor %}
+      </div>
+      <p class="list-summary">
+        {{ students | length }} student(s) registered.
+      </p>
+    {% elif redis_connected %}
+      <div class="empty-state">
+        <div class="empty-icon">🙈</div>
+        <p>No students have registered yet.</p>
+        <a class="btn btn--primary" href="{{ url_for('register') }}">Be the first!</a>
+      </div>
+    {% endif %}
+
+    <!-- ── Redis Explainer ────────────────────────────────────────────── -->
+    <div class="explainer">
+      <h3>🔍 How does the list work?</h3>
+      <p>
+        Redis <strong>Lists</strong> are ordered sequences of strings.
+        Because we use <code>LPUSH</code> (left push), the most recently
+        registered student appears <em>first</em> in the list.
+      </p>
+      <p>
+        <code>LRANGE students:names 0 -1</code>
+        returns every element from index <code>0</code> (first) to
+        <code>-1</code> (last). Negative indices count from the end.
+      </p>
+    </div>
+
+  </div>
+</section>
+
+{% endblock %}

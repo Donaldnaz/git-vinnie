@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% block title %}| Reset{% endblock %}
+
+{% block content %}
+<!--
+  reset.html — Danger zone! Clears all Redis data.
+  Demonstrates: FLUSHALL (wipe the entire Redis database).
+-->
+
+<section class="section">
+  <div class="container container--narrow">
+
+    <h1 class="page-title">🗑️ Reset Application Data</h1>
+    <p class="page-desc">
+      This page is intended for classroom use. It executes
+      <code>FLUSHALL</code> on Redis, removing every key across all databases.
+    </p>
+
+    <!-- ── Success / Error Messages ────────────────────────────────────── -->
+    {% if message %}
+      <div class="alert alert--success">{{ message }}</div>
+    {% endif %}
+    {% if error %}
+      <div class="alert alert--error">{{ error }}</div>
+    {% endif %}
+
+    <!-- ── Redis Connection Warning ────────────────────────────────────── -->
+    {% if not redis_connected %}
+      <div class="alert alert--warning">
+        ⚠️ Redis is unavailable. Cannot reset.
+      </div>
+    {% endif %}
+
+    <!-- ── Warning Box ────────────────────────────────────────────────── -->
+    <div class="danger-box">
+      <h3>⚠️ This Action Is Irreversible</h3>
+      <p>
+        Clicking <strong>Reset All Data</strong> will:
+      </p>
+      <ul>
+        <li>Delete the visitor counter (<code>stats:visitor_count</code>)</li>
+        <li>Delete all student names (<code>students:names</code>)</li>
+        <li>Delete all statistics keys (<code>stats:*</code>)</li>
+        <li>… and every other key in Redis</li>
+      </ul>
+      <p>This is the same as running <code>redis-cli FLUSHALL</code> in the terminal.</p>
+    </div>
+
+    <!-- ── Reset Form ─────────────────────────────────────────────────── -->
+    <form method="POST" action="{{ url_for('reset') }}">
+      <button
+        class="btn btn--danger"
+        type="submit"
+        {% if not redis_connected %}disabled{% endif %}
+        onclick="return confirm('Are you sure? This will delete ALL data from Redis.');"
+      >
+        🗑️ Reset All Data
+      </button>
+    </form>
+
+    <!-- ── Redis Explainer ────────────────────────────────────────────── -->
+    <div class="explainer">
+      <h3>🔍 What does FLUSHALL do?</h3>
+      <p>
+        Redis supports multiple <em>databases</em> (numbered 0–15 by default).
+        <code>FLUSHDB</code> wipes only the <em>current</em> database, while
+        <code>FLUSHALL</code> wipes <em>all</em> databases.
+      </p>
+      <p>
+        In a production system you would <em>never</em> use FLUSHALL — you would
+        instead use <code>DEL</code> or <code>UNLINK</code> with specific key names.
+        This page exists purely to make classroom resets easy.
+      </p>
+      <h3>🔍 Try it in redis-cli</h3>
+      <pre class="code-block">docker compose exec redis redis-cli
+127.0.0.1:6379> KEYS *
+127.0.0.1:6379> FLUSHALL
+127.0.0.1:6379> KEYS *</pre>
+    </div>
+
+  </div>
+</section>
+
+{% endblock %}
