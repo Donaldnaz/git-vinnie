@@ -66,11 +66,6 @@ A Flask + Redis educational application refactored from a monolith into a micros
 git-vinnie/
 ├── compose.yaml                  # Orchestrates all 6 containers
 ├── .env                          # All environment variables (single source of truth)
-├── app.py                        # Original monolith (reference only)
-├── Dockerfile                    # Original Dockerfile (reference only)
-├── requirements.txt              # Original requirements (reference only)
-├── templates/                    # Original templates (reference only)
-├── static/                       # Original static assets (reference only)
 └── services/
     ├── web/                      # UI service
     │   ├── app.py
