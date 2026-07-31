@@ -1,0 +1,133 @@
+services:
+
+  # ---------------------------------------------------------------------------
+  # Infrastructure
+  # ---------------------------------------------------------------------------
+
+  redis:
+    image: redis:alpine
+    container_name: cloudboard_redis
+    command: redis-server --save 60 1 --appendonly yes
+    volumes:
+      - redis-data:/data
+    networks:
+      - cloudboard-net
+
+  redis-commander:
+    image: rediscommander/redis-commander:latest
+    container_name: cloudboard_commander
+    environment:
+      - REDIS_HOSTS=local:redis:6379
+    ports:
+      - "8081:8081"
+    depends_on:
+      - redis
+    networks:
+      - cloudboard-net
+
+  # ---------------------------------------------------------------------------
+  # Backend Microservices
+  # ---------------------------------------------------------------------------
+
+  visitor-service:
+    build:
+      context: ./visitor-service
+      dockerfile: Dockerfile
+    container_name: cloudboard_visitor
+    ports:
+      - "5001:5000"
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - FLASK_DEBUG=0
+    depends_on:
+      - redis
+    networks:
+      - cloudboard-net
+
+  student-service:
+    build:
+      context: ./student-service
+      dockerfile: Dockerfile
+    container_name: cloudboard_student
+    ports:
+      - "5002:5000"
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - FLASK_DEBUG=0
+    depends_on:
+      - redis
+    networks:
+      - cloudboard-net
+
+  stats-service:
+    build:
+      context: ./stats-service
+      dockerfile: Dockerfile
+    container_name: cloudboard_stats
+    ports:
+      - "5003:5000"
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - FLASK_DEBUG=0
+    depends_on:
+      - redis
+    networks:
+      - cloudboard-net
+
+  admin-service:
+    build:
+      context: ./admin-service
+      dockerfile: Dockerfile
+    container_name: cloudboard_admin
+    ports:
+      - "5004:5000"
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - FLASK_DEBUG=0
+    depends_on:
+      - redis
+    networks:
+      - cloudboard-net
+
+  # ---------------------------------------------------------------------------
+  # Frontend (BFF)
+  # ---------------------------------------------------------------------------
+
+  frontend-service:
+    build:
+      context: ./frontend-service
+      dockerfile: Dockerfile
+    container_name: cloudboard_frontend
+    ports:
+      - "8080:5000"
+    environment:
+      - APP_NAME=CloudBoard
+      - APP_GREETING=Welcome to the Docker Compose Workshop!
+      - VISITOR_SERVICE_URL=http://visitor-service:5000
+      - STUDENT_SERVICE_URL=http://student-service:5000
+      - STATS_SERVICE_URL=http://stats-service:5000
+      - ADMIN_SERVICE_URL=http://admin-service:5000
+      - FLASK_DEBUG=0
+    depends_on:
+      - visitor-service
+      - student-service
+      - stats-service
+      - admin-service
+    networks:
+      - cloudboard-net
+
+# ---------------------------------------------------------------------------
+# Volumes & Networks
+# ---------------------------------------------------------------------------
+
+volumes:
+  redis-data:
+    driver: local
+
+networks:
+  cloudboard-net:
+    driver: bridge
