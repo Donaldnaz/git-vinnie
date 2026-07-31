@@ -1,6 +1,6 @@
 # CloudBoard — Microservices Compose File
 # =========================================
-# Orchestrates 4 application services + Redis + Redis Commander.
+# All environment variables are sourced from .env
 #
 # Service layout:
 #   web              — Flask UI (Jinja2), no Redis access, port 8080
@@ -19,14 +19,14 @@ services:
       dockerfile: Dockerfile
     container_name: cloudboard_web
     ports:
-      - "8080:5000"           # Host 8080 → Container 5000
+      - "${WEB_HOST_PORT}:${WEB_PORT}"
     environment:
       APP_NAME: ${APP_NAME}
       APP_GREETING: ${APP_GREETING}
-      FLASK_PORT: "5000"
-      STUDENT_SERVICE_URL: "http://student-service:5001"
-      STATS_SERVICE_URL: "http://stats-service:5002"
-      RESET_SERVICE_URL: "http://reset-service:5003"
+      FLASK_PORT: ${WEB_PORT}
+      STUDENT_SERVICE_URL: ${STUDENT_SERVICE_URL}
+      STATS_SERVICE_URL: ${STATS_SERVICE_URL}
+      RESET_SERVICE_URL: ${RESET_SERVICE_URL}
     depends_on:
       - student-service
       - stats-service
@@ -41,9 +41,9 @@ services:
       dockerfile: Dockerfile
     container_name: cloudboard_student
     environment:
-      REDIS_HOST: redis
-      REDIS_PORT: "6379"
-      FLASK_PORT: "5001"
+      REDIS_HOST: ${REDIS_HOST}
+      REDIS_PORT: ${REDIS_PORT}
+      FLASK_PORT: ${STUDENT_PORT}
     depends_on:
       - redis
     networks:
@@ -56,9 +56,9 @@ services:
       dockerfile: Dockerfile
     container_name: cloudboard_stats
     environment:
-      REDIS_HOST: redis
-      REDIS_PORT: "6379"
-      FLASK_PORT: "5002"
+      REDIS_HOST: ${REDIS_HOST}
+      REDIS_PORT: ${REDIS_PORT}
+      FLASK_PORT: ${STATS_PORT}
     depends_on:
       - redis
     networks:
@@ -71,9 +71,9 @@ services:
       dockerfile: Dockerfile
     container_name: cloudboard_reset
     environment:
-      REDIS_HOST: redis
-      REDIS_PORT: "6379"
-      FLASK_PORT: "5003"
+      REDIS_HOST: ${REDIS_HOST}
+      REDIS_PORT: ${REDIS_PORT}
+      FLASK_PORT: ${RESET_PORT}
     depends_on:
       - redis
     networks:
@@ -94,9 +94,9 @@ services:
     image: rediscommander/redis-commander:latest
     container_name: cloudboard_commander
     environment:
-      - REDIS_HOSTS=ikenna:redis:6379
+      - REDIS_HOSTS=ikenna:${REDIS_HOST}:${REDIS_PORT}
     ports:
-      - "8081:8081"
+      - "${REDIS_COMMANDER_HOST_PORT}:8081"
     depends_on:
       - redis
     networks:
