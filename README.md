@@ -8,20 +8,20 @@ A Flask + Redis educational application refactored from a monolith into a micros
 
 ```
                         ┌─────────────────────────────────┐
-                        │           Browser                │
-                        │      http://<host>:8080          │
+                        │           Browser               │
+                        │      http://<host>:8080         │
                         └────────────────┬────────────────┘
                                          │ HTTP
                                          ▼
                         ┌─────────────────────────────────┐
-                        │          web  (port 5000)        │
-                        │   Flask + Jinja2  |  No Redis    │
-                        │                                  │
-                        │  GET  /                          │
-                        │  GET  /students                  │
-                        │  POST /register                  │
-                        │  GET  /stats                     │
-                        │  POST /reset                     │
+                        │          web  (port 5000)       │
+                        │   Flask + Jinja2  |  No Redis   │
+                        │                                 │
+                        │  GET  /                         │
+                        │  GET  /students                 │
+                        │  POST /register                 │
+                        │  GET  /stats                    │
+                        │  POST /reset                    │
                         └───────┬──────────┬──────────┬───┘
                                 │          │          │
                      HTTP/JSON  │          │          │  HTTP/JSON
@@ -35,13 +35,13 @@ A Flask + Redis educational application refactored from a monolith into a micros
              │ GET  /health     │  │ GET  /stats   │  │                  │
              │                  │  │ GET  /health  │  │                  │
              └────────┬─────────┘  └──────┬────────┘  └────────┬─────────┘
-                      │                   │                     │
-                      └───────────────────┼─────────────────────┘
+                      │                   │                    │
+                      └───────────────────┼────────────────────┘
                                           │ Redis protocol
                                           ▼
                         ┌─────────────────────────────────┐
-                        │         Redis  (port 6379)       │
-                        │       Shared data store          │
+                        │         Redis  (port 6379)      │
+                        │       Shared data store         │
                         └─────────────────────────────────┘
 ```
 
