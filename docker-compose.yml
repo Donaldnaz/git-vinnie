@@ -1,0 +1,59 @@
+version: "3.9"
+
+services:
+
+  # ---- PostgreSQL database ----
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB:       ${DB_NAME}
+      POSTGRES_USER:     ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  # ---- Ticket API service ----
+  ticket-api:
+    build: ./ticket-api
+    restart: unless-stopped
+    environment:
+      DB_HOST:                  db
+      DB_PORT:                  ${DB_PORT}
+      DB_NAME:                  ${DB_NAME}
+      DB_USER:                  ${DB_USER}
+      DB_PASSWORD:              ${DB_PASSWORD}
+      NOTIFICATION_SERVICE_URL: http://notification-service:5002
+      PORT:                     5001
+    depends_on:
+      db:
+        condition: service_healthy
+
+  # ---- Notification service ----
+  notification-service:
+    build: ./notification-service
+    restart: unless-stopped
+    environment:
+      TICKET_API_URL: http://ticket-api:5001
+      PORT:           5002
+
+  # ---- Frontend (Nginx serving index.html + reverse proxy) ----
+  frontend:
+    build: ./frontend
+    restart: unless-stopped
+    environment:
+      TICKET_API_URL:           http://ticket-api:5001
+      NOTIFICATION_SERVICE_URL: http://notification-service:5002
+    ports:
+      - "${FRONTEND_PORT:-8080}:80"
+    depends_on:
+      - ticket-api
+      - notification-service
+
+volumes:
+  db-data:
