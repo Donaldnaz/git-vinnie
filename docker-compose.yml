@@ -28,7 +28,7 @@ services:
       DB_NAME:                  ${DB_NAME}
       DB_USER:                  ${DB_USER}
       DB_PASSWORD:              ${DB_PASSWORD}
-      NOTIFICATION_SERVICE_URL: http://notification-service:5002
+      NOTIFICATION_SERVICE_URL: ${NOTIFICATION_SERVICE_URL}
       PORT:                     5001
     depends_on:
       db:
@@ -39,7 +39,7 @@ services:
     build: ./notification-service
     restart: unless-stopped
     environment:
-      TICKET_API_URL: http://ticket-api:5001
+      TICKET_API_URL: ${TICKET_API_URL}
       PORT:           5002
 
   # ---- Frontend (Nginx serving index.html + reverse proxy) ----
@@ -47,13 +47,29 @@ services:
     build: ./frontend
     restart: unless-stopped
     environment:
-      TICKET_API_URL:           http://ticket-api:5001
-      NOTIFICATION_SERVICE_URL: http://notification-service:5002
+      TICKET_API_URL:           ${TICKET_API_URL}
+      NOTIFICATION_SERVICE_URL: ${NOTIFICATION_SERVICE_URL}
     ports:
       - "${FRONTEND_PORT:-8080}:80"
     depends_on:
       - ticket-api
       - notification-service
 
+  # ---- pgAdmin ----
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    restart: unless-stopped
+    environment:
+      PGADMIN_DEFAULT_EMAIL:    ${PGADMIN_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD}
+    ports:
+      - "${PGADMIN_PORT:-5050}:80"
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin
+
 volumes:
   db-data:
+  pgadmin-data:
